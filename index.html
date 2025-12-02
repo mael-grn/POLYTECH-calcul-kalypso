@@ -25,28 +25,35 @@
             align-items: center;
         }
 
-        h1, h2 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-
-        h1 { font-size: 1.5rem; }
-        h2 { font-size: 1.1rem; border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;}
-
-        /* Section Inputs */
+        /* Input Section Styling */
         .input-section {
             background: var(--card-bg);
-            padding: 25px;
+            padding: 30px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
+            align-items: flex-end; /* Aligne le bouton avec les inputs */
             margin-bottom: 30px;
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Nouveau conteneur pour Label + Input */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            margin-left: 2px;
         }
 
         input {
@@ -54,7 +61,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 1rem;
-            width: 200px;
+            width: 160px; /* Un peu plus petit pour tout faire rentrer */
             transition: border-color 0.3s;
         }
 
@@ -73,6 +80,7 @@
             font-size: 1rem;
             cursor: pointer;
             font-weight: bold;
+            height: 45px; /* Hauteur fixe pour alignement */
             transition: transform 0.2s, background-color 0.3s;
         }
 
@@ -81,11 +89,7 @@
             transform: translateY(-2px);
         }
 
-        button:active {
-            transform: scale(0.98);
-        }
-
-        /* Section Résultats (Grille) */
+        /* Results Section Styling */
         .results-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -100,11 +104,10 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             transition: transform 0.3s, box-shadow 0.3s;
-            opacity: 0; /* Pour l'animation d'apparition */
+            opacity: 0;
             animation: slideUp 0.5s ease-out forwards;
         }
 
-        /* Délais d'animation pour effet cascade */
         .card:nth-child(1) { animation-delay: 0.1s; }
         .card:nth-child(2) { animation-delay: 0.2s; }
         .card:nth-child(3) { animation-delay: 0.3s; }
@@ -115,6 +118,9 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
 
+        h1 { font-size: 1.4rem; color: #2c3e50; margin-top: 0; }
+        h2 { font-size: 1.1rem; border-top: 1px solid #eee; padding-top: 10px; margin-top: 15px; color: #2c3e50; }
+        
         .card p {
             display: flex;
             justify-content: space-between;
@@ -127,33 +133,44 @@
             color: var(--primary-color);
         }
 
-        /* Animations Keyframes */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            input { width: 100%; }
-            button { width: 100%; }
+        @media (max-width: 768px) {
+            .input-group, input, button { width: 100%; }
+            .input-section { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
 
     <div class="input-section">
-        <input type="number" id="prod4" placeholder="Quantité Pech 4">
-        <input type="number" id="prod5.5" placeholder="Quantité Prom 5.5">
-        <input type="number" id="prod8" placeholder="Quantité Stan 8">
-        <input type="number" id="nbMachines" placeholder="Nbr de Machines" value="1">
+        <div class="input-group">
+            <label for="prod4">Qté Pech 4</label>
+            <input type="number" id="prod4" placeholder="0">
+        </div>
         
-        <button id="calculateBtn">Calculer Total</button>
+        <div class="input-group">
+            <label for="prod5.5">Qté Prom 5.5</label>
+            <input type="number" id="prod5.5" placeholder="0">
+        </div>
+
+        <div class="input-group">
+            <label for="prod8">Qté Stan 8</label>
+            <input type="number" id="prod8" placeholder="0">
+        </div>
+
+        <div class="input-group">
+            <label for="nbMachinesMoul">Machines Moulage</label>
+            <input type="number" id="nbMachinesMoul" placeholder="1" value="1">
+        </div>
+
+        <div class="input-group">
+            <label for="nbMachinesFini">Machines Finition</label>
+            <input type="number" id="nbMachinesFini" placeholder="1" value="1">
+        </div>
+        
+        <button id="calculateBtn">Calculer</button>
     </div>
 
     <div class="results-container">
@@ -196,29 +213,30 @@
         const prod4 = document.getElementById('prod4');
         const prod5_5 = document.getElementById('prod5.5');
         const prod8 = document.getElementById('prod8');
-        const nbMachinesInput = document.getElementById('nbMachines'); // Récupération du nouvel input
+        
+        // Récupération des deux inputs séparés
+        const nbMachinesMoulInput = document.getElementById('nbMachinesMoul');
+        const nbMachinesFiniInput = document.getElementById('nbMachinesFini');
+        
         const calculateBtn = document.getElementById('calculateBtn');
 
-        // Plastique Elements
+        // Elements HTML (Plastique, Bois, Moulage, Finition)
         const plastiquePech4 = document.getElementById('plastique-pech4');
         const plastiqueProm5_5 = document.getElementById('plastique-prom5.5');
         const plastiqueStan8 = document.getElementById('plastique-stan8');
         const totalPlastique = document.getElementById('total-plastique');
 
-        // Bois Elements
         const boisPech4 = document.getElementById('bois-pech4');
         const boisProm5_5 = document.getElementById('bois-prom5.5');
         const boisStan8 = document.getElementById('bois-stan8');
         const totalBois = document.getElementById('total-bois');
 
-        // Moulage Elements
         const heureMoulPech4 = document.getElementById('heure-moul-pech4');
         const heureMoulProm5_5 = document.getElementById('heure-moul-prom5.5');
         const heureMoulStan8 = document.getElementById('heure-moul-stan8');
         const totalHeureMoul = document.getElementById('total-heure-moul');
         const totalHeureMoulMachine = document.getElementById('total-heure-moul-machine');
 
-        // Finition Elements
         const heureFiniPech4 = document.getElementById('heure-fini-pech4');
         const heureFiniProm5_5 = document.getElementById('heure-fini-prom5.5');
         const heureFiniStan8 = document.getElementById('heure-fini-stan8');
@@ -226,64 +244,51 @@
         const totalHeureFiniMachine = document.getElementById('total-heure-fini-machine');
 
         calculateBtn.addEventListener('click', () => {
-            // Récupérer les valeurs (0 si vide)
             const val4 = parseFloat(prod4.value) || 0;
             const val5_5 = parseFloat(prod5_5.value) || 0;
             const val8 = parseFloat(prod8.value) || 0;
             
-            // Gestion du nombre de machines (Par défaut 1 pour éviter la division par zéro)
-            let nbMachines = parseFloat(nbMachinesInput.value);
-            if (!nbMachines || nbMachines <= 0) nbMachines = 1;
+            // Gestion indépendante des machines
+            let nbMoul = parseFloat(nbMachinesMoulInput.value);
+            let nbFini = parseFloat(nbMachinesFiniInput.value);
+
+            // Sécurité : Si l'utilisateur met 0 ou rien, on divise par 1 pour éviter les bugs
+            if (!nbMoul || nbMoul <= 0) nbMoul = 1;
+            if (!nbFini || nbFini <= 0) nbFini = 1;
 
             // --- CALCULS PLASTIQUE ---
             plastiquePech4.textContent = (val4 * 0.2).toFixed(2);
             plastiqueProm5_5.textContent = (val5_5 * 0.4).toFixed(2);
             plastiqueStan8.textContent = (val8 * 1).toFixed(2);
-            
-            totalPlastique.textContent = (
-                parseFloat(plastiquePech4.textContent) + 
-                parseFloat(plastiqueProm5_5.textContent) + 
-                parseFloat(plastiqueStan8.textContent)
-            ).toFixed(2);
+            totalPlastique.textContent = (parseFloat(plastiquePech4.textContent) + parseFloat(plastiqueProm5_5.textContent) + parseFloat(plastiqueStan8.textContent)).toFixed(2);
 
             // --- CALCULS BOIS ---
             boisPech4.textContent = (val4 * 0.1).toFixed(2);
             boisProm5_5.textContent = (val5_5 * 0.2).toFixed(2);
             boisStan8.textContent = (val8 * 0.5).toFixed(2);
-            
-            totalBois.textContent = (
-                parseFloat(boisPech4.textContent) + 
-                parseFloat(boisProm5_5.textContent) + 
-                parseFloat(boisStan8.textContent)
-            ).toFixed(2);
+            totalBois.textContent = (parseFloat(boisPech4.textContent) + parseFloat(boisProm5_5.textContent) + parseFloat(boisStan8.textContent)).toFixed(2);
 
             // --- CALCULS MOULAGE ---
             heureMoulPech4.textContent = (val4 * 8).toFixed(2);
             heureMoulProm5_5.textContent = (val5_5 * 12).toFixed(2);
             heureMoulStan8.textContent = (val8 * 28).toFixed(2);
             
-            const totalMoul = parseFloat(heureMoulPech4.textContent) + 
-                              parseFloat(heureMoulProm5_5.textContent) + 
-                              parseFloat(heureMoulStan8.textContent);
-            
+            const totalMoul = parseFloat(heureMoulPech4.textContent) + parseFloat(heureMoulProm5_5.textContent) + parseFloat(heureMoulStan8.textContent);
             totalHeureMoul.textContent = totalMoul.toFixed(2);
             
-            // Mise à jour : Division par le nombre de machines choisi
-            totalHeureMoulMachine.textContent = (totalMoul / nbMachines).toFixed(2);
+            // Division par le nombre de machines de MOULAGE
+            totalHeureMoulMachine.textContent = (totalMoul / nbMoul).toFixed(2);
 
             // --- CALCULS FINITION ---
             heureFiniPech4.textContent = (val4 * 10).toFixed(2);
             heureFiniProm5_5.textContent = (val5_5 * 14).toFixed(2);
             heureFiniStan8.textContent = (val8 * 28).toFixed(2);
             
-            const totalFini = parseFloat(heureFiniPech4.textContent) + 
-                              parseFloat(heureFiniProm5_5.textContent) + 
-                              parseFloat(heureFiniStan8.textContent);
-            
+            const totalFini = parseFloat(heureFiniPech4.textContent) + parseFloat(heureFiniProm5_5.textContent) + parseFloat(heureFiniStan8.textContent);
             totalHeureFini.textContent = totalFini.toFixed(2);
-            
-            // Mise à jour : Division par le nombre de machines choisi
-            totalHeureFiniMachine.textContent = (totalFini / nbMachines).toFixed(2);
+
+            // Division par le nombre de machines de FINITION
+            totalHeureFiniMachine.textContent = (totalFini / nbFini).toFixed(2);
         });
     </script>
 </body>
